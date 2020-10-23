@@ -1,0 +1,26 @@
+steps:
+  # Uses the Cloud Builders Gradle image.
+  - name: 'gcr.io/cloud-builders/gradle'
+    args:
+      # Uncomment for projects that do not include Jib as a plugin.
+      - '--init-script=auto-jib.gradle'
+
+      # Runs the Jib build.
+      # For advanced customizations, configure the plugin in the build.gradle.
+      - 'jib'
+
+      # Sets the target image reference to push to.
+      - '--image=gcr.io/${_PROJECT}/${_IMAGE}'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE}'
+      - '--image'
+      - 'gcr.io/${_PROJECT}/${_IMAGE}'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
